@@ -38,3 +38,22 @@ app.use('/api', apiRoutes);
 app.listen(process.env.PORT, () => {
     console.log(`Server is running on port ${process.env.PORT}`);
 })
+
+// Catch-all for unmatched routes — guarantees the frontend NEVER receives
+// HTML where it expects JSON, no matter which route is missing/misspelled.
+app.use((req, res) => {
+  res.status(404).json({
+    success: false,
+    message: `No matching route: ${req.method} ${req.originalUrl}`,
+  });
+});
+
+// Centralized error handler — catches anything thrown/rejected in your
+// route handlers that isn't already caught locally.
+app.use((err, req, res, next) => {
+  console.error(err);
+  res.status(err.status || 500).json({
+    success: false,
+    message: err.message || "Internal server error.",
+  });
+});
