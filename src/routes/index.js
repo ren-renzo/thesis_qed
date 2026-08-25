@@ -6,6 +6,9 @@ const router = express.Router();
 //authentication
 const authenticationRoutes = require("./../modules/authentication/authentication.router.js");
 
+//loginrequency
+const loginFreqencyRoutes = require("./../modules/authentication/loginfrequency.router.js")
+
 //user accounts
 const userRecordRoutes = require("./../modules/admin/user-record/userRecord.router.js");
 
@@ -32,6 +35,7 @@ const calendarRoutes = require("./../modules/shared/calendar/calendar.router.js"
 const settingsRoutes = require("../modules/settings/school-year-management/sy.router.js");
 
 router.use("/auth", authenticationRoutes);
+router.use("/analytics", loginFreqencyRoutes);
 router.use("/user", userRecordRoutes);
 router.use("/student", studentRecordRoutes);
 router.use("/classes", classesManagementRoutes);
@@ -48,5 +52,15 @@ router.use("/sy", settingsRoutes);
 const mySubjectRoutes = require("./../modules/teacher/my-subjects/mySubjects.router.js");
 
 router.use("/mySubjects", mySubjectRoutes);
+
+//=================================== P A R E N T S ========================================
+
+//dashboard routes
+const parentsProfileRoutes = require("../modules/parents/parentsProfile/parentsProfile.router.js");
+//linked children routes
+const linkedChildrenRoutes = require("./../modules/parents/LinkedChildren/linkedChildren.router.js");
+
+router.use("/profile", parentsProfileRoutes);
+router.use("/linkedChildren", linkedChildrenRoutes);
 
 module.exports = router;

@@ -1,10 +1,10 @@
-const pool = require("../../../../config/db");
+const connection = require("../../../../config/db");
 
 // GET /school-years
 // Get all school years (including inactive ones)
 exports.getAllSchoolYears = async (req, res) => {
   try {
-    const [rows] = await pool.query(
+    const [rows] = await connection.query(
       'SELECT * FROM school_year ORDER BY school_year DESC'
     );
     return res.status(200).json({ success: true, message: 'School years fetched successfully', data: rows });
@@ -18,7 +18,7 @@ exports.getAllSchoolYears = async (req, res) => {
 // Get the currently active school year
 exports.getActiveSchoolYear = async (req, res) => {
   try {
-    const [rows] = await pool.query(
+    const [rows] = await connection.query(
       'SELECT * FROM school_year WHERE is_active = 1 LIMIT 1'
     );
     if (rows.length === 0) {
@@ -35,7 +35,7 @@ exports.getActiveSchoolYear = async (req, res) => {
 exports.getSchoolYearById = async (req, res) => {
   const { id } = req.params;
   try {
-    const [rows] = await pool.query(
+    const [rows] = await connection.query(
       'SELECT * FROM school_year WHERE id = ?',
       [id]
     );
@@ -58,7 +58,7 @@ exports.createSchoolYear = async (req, res) => {
     return res.status(400).json({ success: false, message: 'school_year is required' });
   }
 
-  const connection = await pool.getConnection();
+  const connection = await connection.execute();
   try {
     await connection.beginTransaction();
 
@@ -104,7 +104,7 @@ exports.updateSchoolYear = async (req, res) => {
   const { id } = req.params;
   const { school_year, is_active } = req.body;
 
-  const connection = await pool.getConnection();
+  const connection = await connection.execute();
   try {
     await connection.beginTransaction();
 
@@ -149,11 +149,11 @@ exports.updateSchoolYear = async (req, res) => {
 exports.setActiveSchoolYear = async (req, res) => {
   const { id } = req.params;
 
-  const connection = await pool.getConnection();
+  const connection = await connection.execute();
   try {
     await connection.beginTransaction();
 
-    const [existing] = await connection.query(
+    const [existing] = await connection.execute(
       'SELECT id FROM school_year WHERE id = ?',
       [id]
     );
@@ -181,7 +181,7 @@ exports.setActiveSchoolYear = async (req, res) => {
 exports.deleteSchoolYear = async (req, res) => {
   const { id } = req.params;
   try {
-    const [existing] = await pool.query(
+    const [existing] = await connection.execute(
       'SELECT id, is_active FROM school_year WHERE id = ?',
       [id]
     );
@@ -189,7 +189,7 @@ exports.deleteSchoolYear = async (req, res) => {
       return res.status(404).json({ success: false, message: 'School year not found' });
     }
 
-    await pool.query('UPDATE school_year SET is_active = 0 WHERE id = ?', [id]);
+    await connection.query('UPDATE school_year SET is_active = 0 WHERE id = ?', [id]);
 
     return res.status(200).json({ success: true, message: 'School year deactivated successfully' });
   } catch (error) {

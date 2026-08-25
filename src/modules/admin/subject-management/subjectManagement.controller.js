@@ -82,7 +82,7 @@ exports.addSubjectSection = async (req, res) => {
     });
   }
 
-  const conn = await connection.getConnection();
+  const conn = await connection.execute();
 
   try {
     await conn.beginTransaction();
@@ -202,7 +202,7 @@ exports.updateSubjectSection = async (req, res) => {
     });
   }
 
-  const conn = await connection.getConnection();
+  const conn = await connection.execute();
 
   try {
     await conn.beginTransaction();

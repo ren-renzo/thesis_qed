@@ -15,7 +15,7 @@ exports.createClass = async (req, res) => {
   let conn;
 
   try {
-    conn = await connection.getConnection();
+    conn = await connection.execute;
     await conn.beginTransaction();
 
     // 0. Isang class lang dapat kada section
@@ -145,7 +145,7 @@ exports.updateClass = async (req, res) => {
   let conn;
 
   try {
-    conn = await connection.getConnection();
+    conn = await connection.execute();
     await conn.beginTransaction();
 
     // 1. Confirm the class exists
