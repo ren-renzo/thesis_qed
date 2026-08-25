@@ -42,7 +42,7 @@ const connection = mysql
     database: process.env.DB_NAME,
     dateStrings: true,
     waitForConnections: true,
-    connectionLimit: 3, 
+    connectionLimit: 5, 
     queueLimit: 0,
     // enableKeepAlive: true, // <--- Add this to keep connections alive
     // keepAliveInitialDelay: 10000 // <--- 10 seconds

@@ -3,11 +3,10 @@ const jwt = require("jsonwebtoken");
 const connection = require("../../../config/db"); // mysql2 pool with .promise()
 const ROLE_TABLES = require("../../../config/roleTables");
 const crypto = require("crypto");
-const { sendPasswordResetOtpEmail } = require("../../services/mailer.service"); 
+const { sendPasswordResetOtpEmail } = require("../../services/mailer.service");
 
 const JWT_SECRET = process.env.JWT_SECRET;
 const JWT_EXPIRES_IN = "1h";
-
 
 exports.login = async (req, res) => {
   try {
@@ -31,7 +30,9 @@ exports.login = async (req, res) => {
 
     const table = ROLE_TABLES[user.role];
     if (!table) {
-      return res.status(500).json({ message: "Invalid user role configuration." });
+      return res
+        .status(500)
+        .json({ message: "Invalid user role configuration." });
     }
 
     const [profileRows] = await connection.execute(
@@ -68,8 +69,8 @@ exports.login = async (req, res) => {
     return res
       .cookie("token", token, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === "production" || true,
-        sameSite: process.env.NODE_ENV === "production" ? "strict" : "none",
+        secure: true, // required — "none" won't work without secure
+        sameSite: "none",
         maxAge: 60 * 60 * 1000,
       })
       .status(200)
@@ -180,9 +181,14 @@ exports.changePassword = async (req, res) => {
       return res.status(400).json({ message: "New password is required." });
     }
 
-    if (newPassword.length < 8 || !/[a-z]/.test(newPassword) || !/[0-9]/.test(newPassword)) {
+    if (
+      newPassword.length < 8 ||
+      !/[a-z]/.test(newPassword) ||
+      !/[0-9]/.test(newPassword)
+    ) {
       return res.status(400).json({
-        message: "Password must be at least 8 characters, with at least 1 lowercase letter and 1 number.",
+        message:
+          "Password must be at least 8 characters, with at least 1 lowercase letter and 1 number.",
       });
     }
 
@@ -223,7 +229,9 @@ exports.forgotPassword = async (req, res) => {
     const { userName, email } = req.body;
 
     if (!userName || !email) {
-      return res.status(400).json({ message: "User ID and email are required." });
+      return res
+        .status(400)
+        .json({ message: "User ID and email are required." });
     }
 
     // 1. Hanapin ang account gamit ang user_name
@@ -260,7 +268,9 @@ exports.forgotPassword = async (req, res) => {
 
     await sendPasswordResetOtpEmail({ to: email, otp });
 
-    return res.status(200).json({ message: "OTP sent to your registered email." });
+    return res
+      .status(200)
+      .json({ message: "OTP sent to your registered email." });
   } catch (err) {
     console.error(err);
     return res.status(500).json({ message: "Server error" });
@@ -282,7 +292,8 @@ exports.verifyOtp = async (req, res) => {
     );
 
     const record = authRows[0];
-    const isExpired = !record?.otp_expires_at || new Date(record.otp_expires_at) < new Date();
+    const isExpired =
+      !record?.otp_expires_at || new Date(record.otp_expires_at) < new Date();
 
     if (!record || record.password_reset_otp !== otp || isExpired) {
       return res.status(400).json({ message: "Invalid or expired OTP." });
@@ -312,12 +323,19 @@ exports.resetPassword = async (req, res) => {
     const { resetToken, newPassword } = req.body;
 
     if (!resetToken || !newPassword) {
-      return res.status(400).json({ message: "Reset token and new password are required." });
+      return res
+        .status(400)
+        .json({ message: "Reset token and new password are required." });
     }
 
-    if (newPassword.length < 8 || !/[a-z]/.test(newPassword) || !/[0-9]/.test(newPassword)) {
+    if (
+      newPassword.length < 8 ||
+      !/[a-z]/.test(newPassword) ||
+      !/[0-9]/.test(newPassword)
+    ) {
       return res.status(400).json({
-        message: "Password must be at least 8 characters, with at least 1 lowercase letter and 1 number.",
+        message:
+          "Password must be at least 8 characters, with at least 1 lowercase letter and 1 number.",
       });
     }
 
@@ -326,7 +344,9 @@ exports.resetPassword = async (req, res) => {
     try {
       decoded = jwt.verify(resetToken, JWT_SECRET);
     } catch (err) {
-      return res.status(401).json({ message: "Reset link expired. Please request a new one." });
+      return res
+        .status(401)
+        .json({ message: "Reset link expired. Please request a new one." });
     }
 
     if (decoded.purpose !== "password_reset") {
