@@ -39,10 +39,6 @@ app.use(express.urlencoded({extended:true})) //this will allow to read the url b
 //use routes
 app.use('/api', apiRoutes);
 
-app.listen(process.env.PORT, () => {
-    console.log(`Server is running on port ${process.env.PORT}`);
-})
-
 // Catch-all for unmatched routes — guarantees the frontend NEVER receives
 // HTML where it expects JSON, no matter which route is missing/misspelled.
 app.use((req, res) => {
@@ -61,3 +57,7 @@ app.use((err, req, res, next) => {
     message: err.message || "Internal server error.",
   });
 });
+
+app.listen(process.env.PORT, () => {
+    console.log(`Server is running on port ${process.env.PORT}`);
+})
